@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <memory>
 #include "PluginProcessor.h"
 #include "ui/KeyboardDisplay.h"
 #include "ui/PitchDisplay.h"
@@ -20,7 +21,7 @@ struct KnobCtl {
         label.setText(text.toUpperCase(), juce::dontSendNotification);
         label.setJustificationType(juce::Justification::centred);
         label.setFont(juce::Font(juce::FontOptions(11.f, juce::Font::bold)));
-        label.setColour(juce::Label::textColourId, pcui::kDim);
+        label.setColour(juce::Label::textColourId, pcui::pal().dim);
         parent.addAndMakeVisible(slider);
         parent.addAndMakeVisible(label);
         attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, paramId, slider);
@@ -42,25 +43,41 @@ public:
 
 private:
     void timerCallback() override;
+    void applyTheme(bool dark);          // light/dark switch
+    void updateModeButtons();           // HQ vs Low Latency highlight
 
     PluginLookAndFeel laf; // declared first: outlives every child component
     PitchCorrectorProcessor& proc;
 
-    KnobCtl kAmount, kSpeed, kHumanize, kFlex;
+    // --- Correction section -------------------------------------------------
+    KnobCtl kAmount, kSpeed, kHumanize, kFlex, kMix;
+    // --- Vibrato section ----------------------------------------------------
     KnobCtl kNatVib, kRate, kDepth, kVar, kDelay, kRise;
 
     PitchDisplay display;
     KeyboardDisplay keyboard;
 
-    juce::Label scaleLabel, shapeLabel;
-    juce::ComboBox scale, vibShape;
+    juce::Label scaleLabel, formantLabel;
+    juce::ComboBox scale, formant;
     juce::TextButton bypass{"BYPASS"};
+    juce::TextButton modeHQ{"HQ"}, modeLL{"LOW LATENCY"}, themeBtn{"DARK"};
     std::array<juce::TextButton, 12> rootBtns;
 
-    juce::Rectangle<int> titleArea, leftPanel, rightPanel, vibPanel;
+    bool darkMode = true;
+
+    juce::Rectangle<int> titleArea, leftPanel, rightPanel, vibPanel, headerPanel;
+
+    /// Two knobs stacked vertically inside a panel.
+    static void halves(juce::Rectangle<int> p, KnobCtl& a, KnobCtl& b)
+    {
+        p = p.reduced(4);
+        const int h = p.getHeight() / 2;
+        a.place(p.removeFromTop(h));
+        b.place(p);
+    }
 
     using CA = juce::AudioProcessorValueTreeState::ComboBoxAttachment;
     using BA = juce::AudioProcessorValueTreeState::ButtonAttachment;
-    std::unique_ptr<CA> scaleA, shapeA;
+    std::unique_ptr<CA> scaleA, formantA;
     std::unique_ptr<BA> bypassA;
 };

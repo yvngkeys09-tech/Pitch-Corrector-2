@@ -67,4 +67,21 @@ inline bool isDark() noexcept { return pal().bg.getRed()   // cheap test
 #define PC_ACCENTDIM  pcui::pal().accentDim
 #define PC_ACCENTTEXT pcui::pal().accentText
 #define PC_WHITE      pcui::pal().white
+
+/// Back-compatible names: these now resolve through the active palette, so
+/// every component that uses them repaints correctly in light *and* dark mode.
+inline Colour kBg()         { return pal().bg; }
+inline Colour kPanel()      { return pal().panel; }
+inline Colour kPanelSoft()  { return pal().panelSoft; }
+inline Colour kWell()       { return pal().well; }
+inline Colour kLine()       { return pal().line; }
+inline Colour kText()       { return pal().text; }
+inline Colour kDim()        { return pal().dim; }
+inline Colour kAccent()     { return pal().accent; }
+inline Colour kAccentDim()  { return pal().accentDim; }
+inline Colour kLed()        { return pal().led; }
+inline Colour kBlackKey()   { return pal().blackKey; }
+inline Colour kWhiteKey()   { return pal().whiteKey; }
+inline Colour kTintBlack()  { return pal().tintBlack; }
+inline Colour kTintWhite()  { return pal().tintWhite; }
 }

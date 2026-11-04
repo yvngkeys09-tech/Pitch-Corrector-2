@@ -75,21 +75,24 @@ private:
 
     void drawKey(juce::Graphics& g, int n, int tgt, int det) const
     {
+        auto& P = pcui::pal();
         const auto r = keyRect(n).reduced(0.5f);
         const bool black = isBlack(n);
-        juce::Colour fill = black ? juce::Colour(0xff1b1b1f) : juce::Colour(0xffe9e9ed);
-        if (tint && quantizer.inScale(n)) fill = black ? juce::Colour(0xff7b3a83) : juce::Colour(0xffddb4e2);
-        if (n == tgt) fill = pcui::kAccent;
+        juce::Colour fill = black ? P.blackKey : P.whiteKey;
+        // Soft vertical shading gives each key a subtle 3D profile.
+        if (!black) fill = fill.brighter(0.04f);
+        if (tint && quantizer.inScale(n)) fill = black ? P.tintBlack : P.tintWhite;
+        if (n == tgt) fill = P.accent;
         g.setColour(fill);
         g.fillRoundedRectangle(r, 2.f);
-        g.setColour(juce::Colour(0xff0d0d0f));
+        g.setColour(P.line.withAlpha(0.9f));
         g.drawRoundedRectangle(r, 2.f, 1.f);
         if (n == det) {
             g.setColour(juce::Colours::white);
             g.fillEllipse(r.getCentreX() - 3.f, r.getBottom() - 10.f, 6.f, 6.f);
         }
         if (!black && n % 12 == 0) {
-            g.setColour(juce::Colour(0xff55555c));
+            g.setColour(P.dim);
             g.setFont(juce::Font(juce::FontOptions(10.f)));
             g.drawText("C" + juce::String(n / 12 - 1), r.toNearestInt().withTrimmedTop(juce::jmax(0, getHeight() - 16)),
                        juce::Justification::centredBottom);

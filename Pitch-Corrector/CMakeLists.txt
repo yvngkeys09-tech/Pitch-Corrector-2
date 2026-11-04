@@ -1,14 +1,36 @@
 cmake_minimum_required(VERSION 3.21)
-project(PitchCorrector VERSION 0.1.0 LANGUAGES C CXX)
+project(PitchCorrector VERSION 1.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
-FetchContent_Declare(JUCE
-  GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-  GIT_TAG 8.0.4
-  GIT_SHALLOW TRUE)
-FetchContent_MakeAvailable(JUCE)
+
+# ---------------------------------------------------------------------------
+# JUCE dependency.
+#
+# The previous setup (GIT_REPOSITORY + GIT_SHALLOW) failed with
+#   "FetchContent.cmake ... Build step for juce failed: 1"
+# because a shallow git clone of JUCE combined with FetchContent's
+# UPDATE_DISCONNECTED / subbuild logic is fragile on Windows (long paths,
+# antivirus locks, git grafts).  We now support three robust modes:
+#
+#   1. -DJUCE_SOURCE_DIR=/path/to/JUCE      -> offline, uses a local checkout
+#   2. -DFETCHCONTENT_SOURCE_DIR_JUCE=...   -> same, via standard mechanism
+#   3. default                              -> pinned release tarball (no git)
+# ---------------------------------------------------------------------------
+set(JUCE_SOURCE_DIR "" CACHE PATH
+    "Path to an existing JUCE 8.x source tree (skips the download when set)")
+
+if(JUCE_SOURCE_DIR)
+  message(STATUS "PitchCorrector: using local JUCE at ${JUCE_SOURCE_DIR}")
+  add_subdirectory("${JUCE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/juce-build")
+else()
+  FetchContent_Declare(JUCE
+    URL      https://github.com/juce-framework/JUCE/archive/refs/tags/8.0.4.tar.gz
+    URL_HASH SHA256=0effe9823a6fd8a4f98e5c08be7d308350e417b2d15dcf34011e778fefbbf005
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+  FetchContent_MakeAvailable(JUCE)
+endif()
 
 juce_add_plugin(PitchCorrector
   PRODUCT_NAME "Pitch-Corrector"

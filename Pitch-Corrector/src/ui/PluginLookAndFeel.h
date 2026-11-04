@@ -2,9 +2,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "Theme.h"
 
-/// VocalTune-style flat skin: white/dark cards, thin magenta knob arcs with a
+/// VocalTune-style flat skin: light/dark cards, thin magenta knob arcs with a
 /// filled pie centre, pill buttons and bordered dropdowns. All colours come
-/// from the active light/dark palette.
+/// from the active palette, so switching themes restyles everything at once.
 class PluginLookAndFeel : public juce::LookAndFeel_V4 {
 public:
     PluginLookAndFeel() { applyTheme(); }

@@ -1,0 +1,19 @@
+{
+  "version": 6,
+  "configurePresets": [
+    { "name": "release", "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" } },
+    { "name": "debug", "binaryDir": "${sourceDir}/build/debug",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" } },
+    { "name": "relwithdebinfo", "binaryDir": "${sourceDir}/build/rwdi",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" } }
+  ],
+  "buildPresets": [
+    { "name": "release", "configurePreset": "release", "configuration": "Release" },
+    { "name": "debug", "configurePreset": "debug", "configuration": "Debug" }
+  ],
+  "testPresets": [
+    { "name": "release", "configurePreset": "release", "configuration": "Release",
+      "output": { "outputOnFailure": true } }
+  ]
+}

@@ -71,6 +71,10 @@ public:
     Output update(float midi, const ScaleQuantizer& q, const Params& p) noexcept
     {
         gap = 0;
+        // Guard against wild detector values (octave jumps / glitches): never
+        // let an out-of-range reading poison the history buffer.
+        if (!std::isfinite(midi)) return lastOutput();
+        midi = std::clamp(midi, 24.f, 108.f);
         push(midi);
 
         // ---- 1. Vibrato analysis: slow centre + "is this vibrato?" test -----
@@ -153,6 +157,7 @@ public:
         o.targetNote = curTarget;
         o.centerMidi = center;
         o.vibratoDetected = vibActive;
+        last = o;
         return o;
     }
 
@@ -168,6 +173,9 @@ public:
 
 private:
     static constexpr int kHist = 64; // power of two
+
+    Output lastOutput() const noexcept { return last; }
+
     static float smooth01(float x) noexcept
     {
         x = std::clamp(x, 0.f, 1.f);
@@ -235,4 +243,5 @@ private:
     int curTarget = -1;
     float hold = 0.f, corr = 0.f;
     float vibPhase = 0.f, var1 = 0.f, var2 = 0.17f;
+    Output last{};
 };

@@ -17,8 +17,9 @@ class PsolaShifter {
 public:
     void prepare(double sampleRate, float minHz = 80.f, float maxHz = 1000.f)
     {
-        maxPeriod = static_cast<int>(std::ceil(sampleRate / minHz));
+        maxPeriod = std::max(16, static_cast<int>(std::ceil(sampleRate / minHz)));
         minPeriod = std::max(8, static_cast<int>(sampleRate / maxHz));
+        if (minPeriod > maxPeriod) minPeriod = maxPeriod;
         // Grains read up to ~1.75 periods past the analysis centre and are placed
         // up to one period ahead of the output cursor.
         latency = static_cast<int>(std::ceil(2.75 * maxPeriod)) + 4;
